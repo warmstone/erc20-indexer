@@ -52,27 +52,35 @@ func (c *Client) ERC20Metadata(ctx context.Context, address common.Address) (ERC
 
 	return ERC20Metadata{
 		Address:     address,
-		Name:        asString(name[0]),
-		Symbol:      asString(symbol[0]),
-		Decimals:    asUint8(decimals[0]),
-		TotalSupply: asBigInt(totalSupply[0]),
+		Name:        safeSliceStr(name),
+		Symbol:      safeSliceStr(symbol),
+		Decimals:    safeSliceUint8(decimals),
+		TotalSupply: safeSliceBigInt(totalSupply),
 	}, nil
 }
 
-func asString(v interface{}) string {
-	s, _ := v.(string)
-	return s
-}
-
-func asUint8(v interface{}) uint8 {
-	n, _ := v.(uint8)
-	return n
-}
-
-func asBigInt(v interface{}) *big.Int {
-	n, ok := v.(*big.Int)
-	if !ok || n == nil {
-		return big.NewInt(0)
+func safeSliceStr(s []interface{}) string {
+	if len(s) > 0 {
+		val, _ := s[0].(string)
+		return val
 	}
-	return n
+	return ""
+}
+
+func safeSliceUint8(s []interface{}) uint8 {
+	if len(s) > 0 {
+		val, _ := s[0].(uint8)
+		return val
+	}
+	return 0
+}
+
+func safeSliceBigInt(s []interface{}) *big.Int {
+	if len(s) > 0 {
+		val, ok := s[0].(*big.Int)
+		if ok && val != nil {
+			return val
+		}
+	}
+	return big.NewInt(0)
 }

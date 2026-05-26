@@ -15,7 +15,7 @@ type BlockFetcher struct {
 	retryBackoff time.Duration
 }
 
-func NewBlockFetcher(client *Client, interval time.Duration, retries int, retrcyBackoff time.Duration) *BlockFetcher {
+func NewBlockFetcher(client *Client, interval time.Duration, retries int, retryBackoff time.Duration) *BlockFetcher {
 	if retries < 0 {
 		retries = 0
 	}
@@ -23,7 +23,7 @@ func NewBlockFetcher(client *Client, interval time.Duration, retries int, retrcy
 		client:       client,
 		limiter:      NewRateLimiter(interval),
 		retries:      retries,
-		retryBackoff: retrcyBackoff,
+		retryBackoff: retryBackoff,
 	}
 }
 
@@ -48,7 +48,7 @@ func (f *BlockFetcher) BlockByNumber(ctx context.Context, number uint64, chainID
 			break
 		}
 		if err := sleepBackOff(ctx, f.retryBackoff, attempt); err != nil {
-			return model.IndexedBlock{}, nil
+			return model.IndexedBlock{}, err
 		}
 	}
 	return model.IndexedBlock{}, fmt.Errorf("fetch block %d failed after %d attempt(s): %w", number, f.retries, lastErr)

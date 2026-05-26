@@ -30,7 +30,7 @@ func (r *BlockRepo) Get(ctx context.Context, chainID int64, blockNumber uint64) 
 		SELECT chain_id, block_number, block_hash, parent_hash, timestamp
 		FROM indexed_blocks
 		WHERE chain_id = $1 AND block_number = $2
-	`, chainID, blockNumber).Scan(&b.ChainID, b.BlockNumber, b.BlockHash, b.ParentHash, b.Timestamp)
+	`, chainID, blockNumber).Scan(&b.ChainID, &b.BlockNumber, &b.BlockHash, &b.ParentHash, &b.Timestamp)
 	return b, err
 }
 

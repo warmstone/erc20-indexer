@@ -21,7 +21,7 @@ func (r *BalanceRepo) Add(ctx context.Context, chainID int64, token, holder, del
 	return err
 }
 
-func (r *BalanceRepo) Substract(ctx context.Context, chainID int64, token, holder, delta string, blockNumber uint64) error {
+func (r *BalanceRepo) Subtract(ctx context.Context, chainID int64, token, holder, delta string, blockNumber uint64) error {
 	_, err := r.db.Exec(ctx, `
 		INSERT INTO erc20_balances (chain_id, token_address, holder_address, balance, updated_block_number)
 		VALUES ($1, $2, $3, $4, $5)
@@ -76,7 +76,7 @@ func (r *BalanceRepo) Holders(ctx context.Context, chainID int64, token string, 
 		}
 		out = append(out, b)
 	}
-	return out, nil
+	return out, rows.Err()
 }
 
 func (r *BalanceRepo) RebuildFromTransfer(ctx context.Context, chainID int64) error {
@@ -86,10 +86,10 @@ func (r *BalanceRepo) RebuildFromTransfer(ctx context.Context, chainID int64) er
 		INSERT INTO erc20_balances (chain_id, token_address, holder_address, balance, updated_block_number)
 		SELECT chain_id, token_address, holder_address, SUM(delta), MAX(block_number)
 		FROM (
-			SELECT chain_id, token_address, to_address AS holder_address, value AS delta, block_nubmer
+			SELECT chain_id, token_address, to_address AS holder_address, value AS delta, block_number
 			FROM erc20_transfers
 			WHERE chain_id = $1 AND to_address <> '0x0000000000000000000000000000000000000000'
-			UINON ALL
+			UNION ALL
 			SELECT chain_id, token_address, from_address AS holder_address, (0 - value) AS delta, block_number
 			FROM erc20_transfers
 			WHERE chain_id = $1 AND from_address <> '0x0000000000000000000000000000000000000000'
@@ -115,7 +115,7 @@ func (r *BalanceRepo) RebuildAllowancesFromApprovals(ctx context.Context, chainI
 	return err
 }
 
-func (r *BalanceRepo) DeleteAllowancesAfterBlock(ctx context.Context, chainID int64, blokcNumber int64) error {
-	_, err := r.db.Exec(ctx, `DELETE FROM erc20_allowances WHERE chain_id = $1 AND updated_block_number > $2`, chainID, blokcNumber)
+func (r *BalanceRepo) DeleteAllowancesAfterBlock(ctx context.Context, chainID int64, blockNumber int64) error {
+	_, err := r.db.Exec(ctx, `DELETE FROM erc20_allowances WHERE chain_id = $1 AND updated_block_number > $2`, chainID, blockNumber)
 	return err
 }

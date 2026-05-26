@@ -18,7 +18,7 @@ func (r *SyncStateRepo) GetOrCreate(ctx context.Context, chainID int64, token st
 		return state, nil
 	}
 	if !errors.Is(err, pgx.ErrNoRows) {
-		return model.SyncState{}, nil
+		return model.SyncState{}, err
 	}
 	lastIndexed := uint64(0)
 	if startBlock > 0 {
@@ -50,7 +50,7 @@ func (r *SyncStateRepo) Upsert(ctx context.Context, s model.SyncState) error {
 		ON CONFLICT (chain_id, token_address) DO UPDATE SET
 			last_indexed_block = EXCLUDED.last_indexed_block,
 			finalized_block = EXCLUDED.finalized_block,
-			update_at = now()
+			updated_at = now()
 	`, s.ChainID, s.TokenAddress, s.LastIndexedBlock, s.FinalizedBlock)
 	return err
 }

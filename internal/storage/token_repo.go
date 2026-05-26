@@ -36,7 +36,7 @@ func (r *TokenRepo) SetActive(ctx context.Context, chainID int64, address string
 func (r *TokenRepo) Get(ctx context.Context, chainID int64, address string) (model.Token, error) {
 	var t model.Token
 	err := r.db.QueryRow(ctx, `
-		SELECT chain_id, addrss, name, symbol, decimals, total_supply, is_active, created_at, updated_at
+		SELECT chain_id, address, name, symbol, decimals, total_supply, is_active, created_at, updated_at
 		FROM tokens
 		WHERE chain_id = $1 AND address = $2
 	`, chainID, address).Scan(&t.ChainID, &t.Address, &t.Name, &t.Symbol, &t.Decimals, &t.TotalSupply, &t.IsActive, &t.CreatedAt, &t.UpdatedAt)
@@ -45,7 +45,7 @@ func (r *TokenRepo) Get(ctx context.Context, chainID int64, address string) (mod
 
 func (r *TokenRepo) List(ctx context.Context, chainID int64) ([]model.Token, error) {
 	rows, err := r.db.Query(ctx, `
-		SELECT chain_id, addrss, name, symbol, decimals, total_supply, is_active, created_at, updated_at
+		SELECT chain_id, address, name, symbol, decimals, total_supply, is_active, created_at, updated_at
 		FROM tokens
 		WHERE chain_id = $1
 		ORDER BY address
@@ -68,7 +68,7 @@ func (r *TokenRepo) List(ctx context.Context, chainID int64) ([]model.Token, err
 
 func (r *TokenRepo) ListActive(ctx context.Context, chainID int64) ([]model.Token, error) {
 	rows, err := r.db.Query(ctx, `
-		SELECT chain_id, addrss, name, symbol, decimals, total_supply, is_active, created_at, updated_at
+		SELECT chain_id, address, name, symbol, decimals, total_supply, is_active, created_at, updated_at
 		FROM tokens
 		WHERE chain_id = $1 AND is_active = true
 		ORDER BY address

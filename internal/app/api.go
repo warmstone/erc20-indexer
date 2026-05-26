@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"net/http"
+	"time"
 
 	apihttp "erc20-indexer/internal/api"
 	"erc20-indexer/internal/chain"
@@ -32,8 +33,12 @@ func NewAPIServer(ctx context.Context, cfg config.Config) (*APIServer, error) {
 	handler := apihttp.NewHandler(cfg.Chain.ChainID, cfg.Chain.StartBlock, repos, chainClient)
 	return &APIServer{
 		httpServer: &http.Server{
-			Addr:    cfg.API.Addr,
-			Handler: apihttp.NewRouter(handler),
+			Addr:              cfg.API.Addr,
+			Handler:           apihttp.NewRouter(handler),
+			ReadTimeout:       10 * time.Second,
+			WriteTimeout:      30 * time.Second,
+			IdleTimeout:       120 * time.Second,
+			ReadHeaderTimeout: 5 * time.Second,
 		},
 		db:    db,
 		chain: chainClient,

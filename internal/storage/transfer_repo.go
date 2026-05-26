@@ -44,7 +44,7 @@ func (r *TransferRepo) List(ctx context.Context, chainID int64, token, holder st
 	var out []model.Transfer
 	for rows.Next() {
 		var t model.Transfer
-		if err := rows.Scan(&t.ChainID, &t.ToAddress, &t.BlockNumber, &t.BlockHash, &t.TxHash, &t.LogIndex, &t.FromAddress, &t.ToAddress, &t.Value, &t.Timestamp); err != nil {
+		if err := rows.Scan(&t.ChainID, &t.TokenAddress, &t.BlockNumber, &t.BlockHash, &t.TxHash, &t.LogIndex, &t.FromAddress, &t.ToAddress, &t.Value, &t.Timestamp); err != nil {
 			return nil, err
 		}
 		out = append(out, t)
@@ -53,6 +53,6 @@ func (r *TransferRepo) List(ctx context.Context, chainID int64, token, holder st
 }
 
 func (r *TransferRepo) DeleteAfterBlock(ctx context.Context, chainID int64, blockNumber uint64) error {
-	_, err := r.db.Exec(ctx, `DELETE FROM erc20_transfer WHERE chain_id = $1 AND block_number > $2`, chainID, blockNumber)
+	_, err := r.db.Exec(ctx, `DELETE FROM erc20_transfers WHERE chain_id = $1 AND block_number > $2`, chainID, blockNumber)
 	return err
 }

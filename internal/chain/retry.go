@@ -2,6 +2,7 @@ package chain
 
 import (
 	"context"
+	"math/rand"
 	"time"
 )
 
@@ -19,6 +20,7 @@ func sleepBackOff(ctx context.Context, base time.Duration, attempt int) error {
 			break
 		}
 	}
+	wait += time.Duration(rand.Int63n(int64(wait) / 2))
 	timer := time.NewTimer(wait)
 	defer timer.Stop()
 	select {
