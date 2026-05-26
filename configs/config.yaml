@@ -1,0 +1,24 @@
+chain:
+  chain_id: 11155111
+  rpc_url: "https://sepolia.infura.io/v3/c5c8052027df4442b05c60982f0c9ed4"
+  start_block: 10807159
+  confirmations: 24
+  batch_size: 1000
+  min_batch_size: 10
+  poll_interval: "10s"
+  log_interval: "200ms"
+  log_retries: 3
+  log_retry_backoff: "500ms"
+  block_interval: "50ms"
+  block_retries: 2
+  blcok_retry_backoff: "300ms"
+  reorg_depth: 64
+
+tokens:
+  - "0xc2c651b27d0420632354a435e8da6811f70ba4ee"
+
+database:
+  dsn: "postgres://postgres:postgres@localhost:5432/erc20_indexer?sslmode=disable"
+
+api:
+  addr: ":8080"
